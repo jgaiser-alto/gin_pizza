@@ -1,10 +1,15 @@
-package pizza_test
+package tests
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-test/deep"
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"net/http"
+	"net/http/httptest"
 	"pizza/pkg/common/models"
 	"regexp"
 )
@@ -15,15 +20,21 @@ func (s *PizzaTestSuite) TestExpectedPizzaIsReturned() {
 		name        = "test-name"
 		description = "a test pizza"
 	)
+	url := fmt.Sprintf("%s/%s", s.baseUri, id.String())
+	request, _ := http.NewRequest("GET", url, nil)
+	recorder := httptest.NewRecorder()
 
-	s.mock.ExpectQuery(regexp.QuoteMeta(
-		`SELECT * FROM "pizzas" WHERE (id = $1)`)).
+	s.mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "pizzas" WHERE "pizzas"."id" = $1`)).
 		WithArgs(id.String()).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "name", "description"}).
 			AddRow(id.String(), name, description))
 
-	res, err := s.repo.Get(id)
+	s.router.ServeHTTP(recorder, request)
 
-	require.NoError(s.T(), err)
-	require.Nil(s.T(), deep.Equal(&models.Pizza{ID: id, Name: name}, res))
+	// Convert the JSON response to a map
+	var response models.Pizza
+	json.Unmarshal([]byte(recorder.Body.String()), &response)
+
+	assert.Equal(s.T(), http.StatusOK, recorder.Code)
+	require.Nil(s.T(), deep.Equal(&models.Pizza{ID: id, Name: name, Description: description}, &response))
 }
