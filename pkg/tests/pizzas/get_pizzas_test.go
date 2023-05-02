@@ -2,39 +2,38 @@ package tests
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/go-test/deep"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"pizza/pkg/common/models"
 	"regexp"
 )
 
-func (s *PizzaTestSuite) TestExpectedPizzaIsReturned() {
+func (s *PizzaTestSuite) TestExpectedPizzasAreReturned() {
 	var (
-		id, _       = uuid.NewUUID()
+		id1, _      = uuid.NewUUID()
+		id2, _      = uuid.NewUUID()
+		id3, _      = uuid.NewUUID()
 		name        = "test-name"
 		description = "a test pizza"
 	)
-	url := fmt.Sprintf("%s/%s", s.baseUri, id.String())
-	request, _ := http.NewRequest("GET", url, nil)
+	request, _ := http.NewRequest("GET", s.baseUri, nil)
 	recorder := httptest.NewRecorder()
 
-	s.mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "pizzas" WHERE "pizzas"."id" = $1`)).
-		WithArgs(id.String()).
+	s.mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "pizzas"`)).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "name", "description"}).
-			AddRow(id.String(), name, description))
+			AddRow(id1, name, description).
+			AddRow(id2, name, description).
+			AddRow(id3, name, description),
+		)
 
 	s.router.ServeHTTP(recorder, request)
 
-	// Convert the JSON response to a map
-	var response models.Pizza
+	var response []models.Pizza
 	json.Unmarshal([]byte(recorder.Body.String()), &response)
 
 	assert.Equal(s.T(), http.StatusOK, recorder.Code)
-	require.Nil(s.T(), deep.Equal(&models.Pizza{ID: id, Name: name, Description: description}, &response))
+	assert.Equal(s.T(), 3, len(response))
 }

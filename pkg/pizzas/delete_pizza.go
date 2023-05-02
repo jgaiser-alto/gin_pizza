@@ -12,11 +12,11 @@ func (h handler) DeletePizza(ctx *gin.Context) {
 		ctx.AbortWithError(http.StatusNotFound, parseError)
 	}
 
-	result, err := h.Repository.Get(id)
+	pizza, err := h.Repository.Get(id)
 	if err != nil {
 		ctx.AbortWithError(http.StatusNotFound, err)
 	}
-	h.Repository.Delete(id)
+	h.Repository.Delete(*pizza)
 
-	ctx.JSON(http.StatusOK, &result)
+	ctx.JSON(http.StatusOK, &pizza)
 }
