@@ -19,7 +19,7 @@ func (s *PizzaTestSuite) TestExpectedPizzasAreReturned() {
 		name        = "test-name"
 		description = "a test pizza"
 	)
-	request, _ := http.NewRequest("GET", s.baseUri, nil)
+	request, _ := http.NewRequest(http.MethodGet, s.baseUri, nil)
 	recorder := httptest.NewRecorder()
 
 	s.mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "pizzas"`)).

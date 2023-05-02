@@ -23,6 +23,11 @@ type PizzaTestSuite struct {
 	baseUri string
 }
 
+func (s *PizzaTestSuite) BeforeTest(_, _ string) {
+	// prevent shared state between tests
+	s.SetupSuite()
+}
+
 func (s *PizzaTestSuite) AfterTest(_, _ string) {
 	require.NoError(s.T(), s.mock.ExpectationsWereMet())
 }
