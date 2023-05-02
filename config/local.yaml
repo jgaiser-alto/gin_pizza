@@ -1,0 +1,5 @@
+server:
+  port: 3000
+  api_key: 6f3b3807-101c-499c-85d8-def0bed55d1b
+database:
+  url: postgres://user:password@localhost:5432/app

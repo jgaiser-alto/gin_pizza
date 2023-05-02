@@ -1,10 +1,17 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"github.com/spf13/viper"
+)
 
 type Config struct {
-	Port  string `mapstructure:"PORT"`
-	DBUrl string `mapstructure:"DB_URL"`
+	Server struct {
+		Host string `yaml:"host"`
+		Port string `yaml:"port"`
+	} `yaml:"server"`
+	Database struct {
+		Url string `yaml:"url"`
+	} `yaml:"database"`
 }
 
 func LoadConfig() (c Config, err error) {

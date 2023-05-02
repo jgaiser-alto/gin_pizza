@@ -6,12 +6,12 @@ import (
 )
 
 type handler struct {
-	DB *gorm.DB
+	Repository Repository
 }
 
 func RegisterRoutes(router *gin.Engine, db *gorm.DB) {
 	h := &handler{
-		DB: db,
+		Repository: CreateRepository(db),
 	}
 	routes := router.Group("/pizzas")
 	routes.GET("/", h.GetPizzas)

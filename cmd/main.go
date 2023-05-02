@@ -1,18 +1,29 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	"log"
 	"pizza/pkg/common/db"
 	"pizza/pkg/pizzas"
 )
 
 func main() {
-	viper.SetConfigFile("./pkg/common/envs/.env")
-	viper.ReadInConfig()
+	config := viper.New()
+	config.SetConfigName("local")
+	config.AddConfigPath("./config")
+	if err := config.ReadInConfig(); err != nil {
+		log.Fatal(err)
+	}
 
-	port := viper.Get("PORT").(string)
-	dbUrl := viper.Get("DB_URL").(string)
+	run(config)
+}
+
+func run(config *viper.Viper) {
+	var host = config.GetString("server.host")
+	var port = config.GetString("server.port")
+	var dbUrl = config.GetString("database.url")
 
 	router := gin.Default()
 	dbHandler := db.Init(dbUrl)
@@ -26,5 +37,5 @@ func main() {
 		})
 	})
 
-	router.Run(port)
+	router.Run(fmt.Sprintf("%s:%s", host, port))
 }

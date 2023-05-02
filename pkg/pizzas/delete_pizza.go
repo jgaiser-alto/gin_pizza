@@ -2,20 +2,21 @@ package pizzas
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"net/http"
-	"pizza/pkg/common/models"
 )
 
 func (h handler) DeletePizza(ctx *gin.Context) {
-	id := ctx.Param("id")
-
-	var pizza models.Pizza
-
-	if result := h.DB.First(&pizza, id); result.Error != nil {
-		ctx.AbortWithError(http.StatusNotFound, result.Error)
+	var id, parseError = uuid.Parse(ctx.Param("id"))
+	if parseError != nil {
+		ctx.AbortWithError(http.StatusNotFound, parseError)
 	}
 
-	h.DB.Delete(&pizza)
+	result, err := h.Repository.Get(id)
+	if err != nil {
+		ctx.AbortWithError(http.StatusNotFound, err)
+	}
+	h.Repository.Delete(id)
 
-	ctx.JSON(http.StatusOK, &pizza)
+	ctx.JSON(http.StatusOK, &result)
 }

@@ -3,16 +3,15 @@ package pizzas
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"pizza/pkg/common/models"
 )
 
 func (h handler) GetPizzas(ctx *gin.Context) {
-	var pizzas []models.Pizza
 
-	if result := h.DB.Find(&pizzas); result.Error != nil {
-		ctx.AbortWithError(http.StatusNotFound, result.Error)
+	result, err := h.Repository.GetAll()
+	if err != nil {
+		ctx.AbortWithError(http.StatusNotFound, err)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, &pizzas)
+	ctx.JSON(http.StatusOK, &result)
 }

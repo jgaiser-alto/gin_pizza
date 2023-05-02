@@ -13,21 +13,19 @@ type addPizzaRequestBody struct {
 
 func (h handler) AddPizza(ctx *gin.Context) {
 	body := addPizzaRequestBody{}
-
 	if err := ctx.BindJSON(&body); err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	var pizza models.Pizza
-
-	pizza.Name = body.Name
-	pizza.Description = body.Description
-
-	if result := h.DB.Create(&pizza); result.Error != nil {
-		ctx.AbortWithError(http.StatusNotFound, result.Error)
+	pizza := models.Pizza{
+		Name:        body.Name,
+		Description: body.Description,
+	}
+	result, err := h.Repository.Create(pizza)
+	if err != nil {
+		ctx.AbortWithError(http.StatusNotFound, err)
 		return
 	}
-
-	ctx.JSON(http.StatusCreated, &pizza)
+	ctx.JSON(http.StatusCreated, result)
 }
