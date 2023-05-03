@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func (h handler) DeletePizza(ctx *gin.Context) {
+func (h *handler) DeletePizza(ctx *gin.Context) {
 	var id, parseError = uuid.Parse(ctx.Param("id"))
 	if parseError != nil {
 		ctx.AbortWithError(http.StatusNotFound, parseError)

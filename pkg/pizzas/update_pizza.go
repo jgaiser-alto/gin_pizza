@@ -11,7 +11,7 @@ type UpdatePizzaRequestBody struct {
 	Description string `json:"description"`
 }
 
-func (h handler) UpdatePizza(ctx *gin.Context) {
+func (h *handler) UpdatePizza(ctx *gin.Context) {
 	var id, parseError = uuid.Parse(ctx.Param("id"))
 	if parseError != nil {
 		ctx.AbortWithError(http.StatusNotFound, parseError)

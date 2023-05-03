@@ -11,7 +11,7 @@ type addPizzaRequestBody struct {
 	Description string `json:"description"`
 }
 
-func (h handler) AddPizza(ctx *gin.Context) {
+func (h *handler) AddPizza(ctx *gin.Context) {
 	body := addPizzaRequestBody{}
 	if err := ctx.BindJSON(&body); err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)

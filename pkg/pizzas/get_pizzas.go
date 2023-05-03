@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (h handler) GetPizzas(ctx *gin.Context) {
+func (h *handler) GetPizzas(ctx *gin.Context) {
 
 	result, err := h.Repository.GetAll()
 	if err != nil {

@@ -10,7 +10,7 @@ type handler struct {
 }
 
 func RegisterRoutes(router *gin.Engine, db *gorm.DB) {
-	h := &handler{
+	h := handler{
 		Repository: CreateRepository(db),
 	}
 	routes := router.Group("/pizzas")
