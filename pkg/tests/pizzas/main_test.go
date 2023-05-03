@@ -15,12 +15,12 @@ import (
 
 type PizzaTestSuite struct {
 	suite.Suite
-	DB      *gorm.DB
-	mock    sqlmock.Sqlmock
-	router  *gin.Engine
-	repo    pizzas.Repository
-	pizza   *models.Pizza
-	baseUri string
+	DB         *gorm.DB
+	mock       sqlmock.Sqlmock
+	router     *gin.Engine
+	repository pizzas.Repository
+	pizza      *models.Pizza
+	baseUri    string
 }
 
 func (s *PizzaTestSuite) BeforeTest(_, _ string) {
@@ -53,7 +53,7 @@ func (s *PizzaTestSuite) SetupSuite() {
 	s.DB, err = gorm.Open(dialector, &gorm.Config{})
 	require.NoError(s.T(), err)
 
-	s.repo = pizzas.CreateRepository(s.DB)
+	s.repository = pizzas.CreateRepository(s.DB)
 	s.baseUri = "/pizzas"
 
 	router := gin.Default()

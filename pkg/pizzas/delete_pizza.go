@@ -6,17 +6,20 @@ import (
 	"net/http"
 )
 
-func (h handler) DeletePizza(ctx *gin.Context) {
+func (h *handler) DeletePizza(ctx *gin.Context) {
 	var id, parseError = uuid.Parse(ctx.Param("id"))
 	if parseError != nil {
 		ctx.AbortWithError(http.StatusNotFound, parseError)
 	}
 
-	pizza, err := h.Repository.Get(id)
-	if err != nil {
-		ctx.AbortWithError(http.StatusNotFound, err)
+	if pizza, getErr := h.Repository.Get(id); getErr != nil {
+		ctx.AbortWithError(http.StatusNotFound, getErr)
+	} else {
+		if deleteErr := h.Repository.Delete(*pizza); deleteErr != nil {
+			ctx.AbortWithError(http.StatusInternalServerError, deleteErr)
+		}
 	}
-	h.Repository.Delete(*pizza)
 
-	ctx.JSON(http.StatusOK, &pizza)
+	// Responds with no response body
+	ctx.Status(http.StatusOK)
 }

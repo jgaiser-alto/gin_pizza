@@ -16,11 +16,15 @@ type Repository interface {
 	Delete(pizza models.Pizza) error
 }
 
-type repo struct {
+type repository struct {
 	DB *gorm.DB
 }
 
-func (p *repo) Get(id uuid.UUID) (*models.Pizza, error) {
+func CreateRepository(db *gorm.DB) Repository {
+	return &repository{DB: db}
+}
+
+func (p *repository) Get(id uuid.UUID) (*models.Pizza, error) {
 	var pizza models.Pizza
 	result := p.DB.First(&pizza, id)
 	if result.Error != nil {
@@ -30,7 +34,7 @@ func (p *repo) Get(id uuid.UUID) (*models.Pizza, error) {
 	return &pizza, result.Error
 }
 
-func (p *repo) GetAll() ([]*models.Pizza, error) {
+func (p *repository) GetAll() ([]*models.Pizza, error) {
 	var pizzas []*models.Pizza
 	result := p.DB.Find(&pizzas)
 	if result.Error != nil {
@@ -41,7 +45,7 @@ func (p *repo) GetAll() ([]*models.Pizza, error) {
 	return pizzas, result.Error
 }
 
-func (p *repo) Create(pizza models.Pizza) (*models.Pizza, error) {
+func (p *repository) Create(pizza models.Pizza) (*models.Pizza, error) {
 	result := p.DB.Clauses(clause.Returning{}).Select("Name", "Description").Create(&pizza)
 	if result.Error != nil {
 		fmt.Printf("pizza machine broke: %d", result.Error)
@@ -50,7 +54,7 @@ func (p *repo) Create(pizza models.Pizza) (*models.Pizza, error) {
 	return &pizza, result.Error
 }
 
-func (p *repo) Update(pizza models.Pizza) (*models.Pizza, error) {
+func (p *repository) Update(pizza models.Pizza) (*models.Pizza, error) {
 	result := p.DB.Clauses(clause.Returning{}).Select("Name", "Description").Save(&pizza)
 	if result.Error != nil {
 		fmt.Printf("pizza machine broke: %d", result.Error)
@@ -59,15 +63,10 @@ func (p *repo) Update(pizza models.Pizza) (*models.Pizza, error) {
 	return &pizza, result.Error
 }
 
-func (p *repo) Delete(pizza models.Pizza) error {
-	result := p.DB.Delete(&pizza)
-	if result.Error != nil {
+func (p *repository) Delete(pizza models.Pizza) error {
+	if result := p.DB.Delete(pizza); result.Error != nil {
 		fmt.Printf("pizza machine broke: %d", result.Error)
 		return result.Error
 	}
-	return result.Error
-}
-
-func CreateRepository(db *gorm.DB) Repository {
-	return &repo{DB: db}
+	return nil
 }

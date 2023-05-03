@@ -4,10 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/go-test/deep"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"pizza/pkg/common/models"
@@ -24,16 +22,15 @@ func (s *PizzaTestSuite) TestExpectedPizzaIsDeleted() {
 	request, _ := http.NewRequest(http.MethodDelete, url, nil)
 	recorder := httptest.NewRecorder()
 
-	s.mock.ExpectQuery(regexp.QuoteMeta(`DELETE FROM "pizzas" WHERE "pizzas"."id" = $1`)).
+	s.mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "pizzas" WHERE "pizzas"."id" = $1`)).
 		WithArgs(id.String()).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "name", "description"}).
 			AddRow(id.String(), name, description))
 
 	s.mock.ExpectBegin()
-	s.mock.ExpectQuery(regexp.QuoteMeta(`DELETE`)).
-		WithArgs(id.String()).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "name", "description"}).
-			AddRow(id.String(), name, description))
+	s.mock.ExpectExec(regexp.QuoteMeta(`DELETE FROM "pizzas" WHERE "pizzas"."id" = $1`)).
+		WithArgs(id).
+		WillReturnResult(sqlmock.NewResult(1, 1))
 	s.mock.ExpectCommit()
 
 	s.router.ServeHTTP(recorder, request)
@@ -43,5 +40,4 @@ func (s *PizzaTestSuite) TestExpectedPizzaIsDeleted() {
 	json.Unmarshal([]byte(recorder.Body.String()), &response)
 
 	assert.Equal(s.T(), http.StatusOK, recorder.Code)
-	require.Nil(s.T(), deep.Equal(&models.Pizza{ID: id, Name: name, Description: description}, &response))
 }
