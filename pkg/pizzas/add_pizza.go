@@ -8,8 +8,8 @@ import (
 )
 
 type AddPizzaRequestBody struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	Name        string `json:"name"  binding:"required"`
+	Description string `json:"description"  binding:"required"`
 }
 
 func (h handler) AddPizza(ctx *gin.Context) {
@@ -22,7 +22,7 @@ func (h handler) AddPizza(ctx *gin.Context) {
 	result, err := h.Repository.Create(toPizza(body))
 	if err != nil {
 		fmt.Printf("failed to create pizza: %s\n", err)
-		ctx.AbortWithError(http.StatusNotFound, err)
+		ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 

@@ -3,6 +3,7 @@ package tests
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/go-test/deep"
 	"github.com/google/uuid"
@@ -42,4 +43,42 @@ func (s *PizzaTestSuite) TestExpectedPizzaIsCreated() {
 	if diff := deep.Equal(expectedPizza, &response); diff != nil {
 		s.T().Error(diff)
 	}
+}
+
+func (s *PizzaTestSuite) TestMalformedCreateRequest() {
+	var (
+		body = pizzas.AddPizzaRequestBody{
+			Name:        "NO Description",
+			Description: "",
+		}
+		jsonBody, _ = json.Marshal(body)
+		recorder    = httptest.NewRecorder()
+		request, _  = http.NewRequest(http.MethodPost, s.baseUri, bytes.NewBuffer(jsonBody))
+	)
+
+	s.router.ServeHTTP(recorder, request)
+
+	assert.Equal(s.T(), http.StatusBadRequest, recorder.Code)
+}
+
+func (s *PizzaTestSuite) TestCreateExceptionIsThrown() {
+	var (
+		body = pizzas.AddPizzaRequestBody{
+			Name:        "new pizza",
+			Description: "a new pizza pie",
+		}
+		jsonBody, _ = json.Marshal(body)
+		recorder    = httptest.NewRecorder()
+		request, _  = http.NewRequest(http.MethodPost, s.baseUri, bytes.NewBuffer(jsonBody))
+	)
+
+	s.mock.ExpectBegin()
+	s.mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "pizzas"`)).
+		WithArgs(body.Name, body.Description, sqlmock.AnyArg(), sqlmock.AnyArg()).
+		WillReturnError(errors.New("something didn't work"))
+	s.mock.ExpectRollback()
+
+	s.router.ServeHTTP(recorder, request)
+
+	assert.Equal(s.T(), http.StatusInternalServerError, recorder.Code)
 }

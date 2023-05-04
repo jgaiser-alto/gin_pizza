@@ -9,8 +9,8 @@ import (
 )
 
 type UpdatePizzaRequestBody struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	Name        string `json:"name" binding:"required"`
+	Description string `json:"description" binding:"required"`
 }
 
 func (h handler) UpdatePizza(ctx *gin.Context) {

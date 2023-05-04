@@ -19,10 +19,11 @@ func (s *PizzaTestSuite) TestExpectedPizzaIsReturned() {
 		id, _       = uuid.NewUUID()
 		name        = "test-name"
 		description = "a test pizza"
+		url         = fmt.Sprintf("%s/%s", s.baseUri, id.String())
+		request, _  = http.NewRequest(http.MethodGet, url, nil)
+		recorder    = httptest.NewRecorder()
+		response    models.Pizza
 	)
-	url := fmt.Sprintf("%s/%s", s.baseUri, id.String())
-	request, _ := http.NewRequest(http.MethodGet, url, nil)
-	recorder := httptest.NewRecorder()
 
 	s.mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "pizzas" WHERE "pizzas"."id" = $1`)).
 		WithArgs(id.String()).
@@ -31,10 +32,35 @@ func (s *PizzaTestSuite) TestExpectedPizzaIsReturned() {
 
 	s.router.ServeHTTP(recorder, request)
 
-	// Convert the JSON response to a map
-	var response models.Pizza
 	json.Unmarshal([]byte(recorder.Body.String()), &response)
-
 	assert.Equal(s.T(), http.StatusOK, recorder.Code)
 	require.Nil(s.T(), deep.Equal(&models.Pizza{ID: id, Name: name, Description: description}, &response))
+}
+
+func (s *PizzaTestSuite) TestPizzaNotFound() {
+	var (
+		id, _      = uuid.NewUUID()
+		url        = fmt.Sprintf("%s/%s", s.baseUri, id.String())
+		request, _ = http.NewRequest(http.MethodGet, url, nil)
+		recorder   = httptest.NewRecorder()
+	)
+
+	s.mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "pizzas" WHERE "pizzas"."id" = $1`)).
+		WithArgs(id.String()).
+		WillReturnRows(sqlmock.NewRows(nil))
+
+	s.router.ServeHTTP(recorder, request)
+	assert.Equal(s.T(), http.StatusNotFound, recorder.Code)
+}
+
+func (s *PizzaTestSuite) TestMalformedRequest() {
+	var (
+		id         = "this is not a uuid"
+		url        = fmt.Sprintf("%s/%s", s.baseUri, id)
+		request, _ = http.NewRequest(http.MethodGet, url, nil)
+		recorder   = httptest.NewRecorder()
+	)
+
+	s.router.ServeHTTP(recorder, request)
+	assert.Equal(s.T(), http.StatusNotFound, recorder.Code)
 }
