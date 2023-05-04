@@ -9,6 +9,6 @@ type Pizza struct {
 	ID          uuid.UUID `json:"id" gorm:"type:uuid;default:gen_random_uuid()"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	CreatedAt   time.Time `deep:"-"`
+	UpdatedAt   time.Time `deep:"-"`
 }

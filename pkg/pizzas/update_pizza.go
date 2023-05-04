@@ -1,9 +1,11 @@
 package pizzas
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
+	"pizza/pkg/common/models"
 )
 
 type UpdatePizzaRequestBody struct {
@@ -12,18 +14,19 @@ type UpdatePizzaRequestBody struct {
 }
 
 func (h handler) UpdatePizza(ctx *gin.Context) {
-	var id, parseError = uuid.Parse(ctx.Param("id"))
-	if parseError != nil {
-		ctx.AbortWithError(http.StatusNotFound, parseError)
+	var id, err = uuid.Parse(ctx.Param("id"))
+	if err != nil {
+		ctx.AbortWithError(http.StatusNotFound, err)
 	}
-	body := UpdatePizzaRequestBody{}
 
+	body := UpdatePizzaRequestBody{}
 	if err := ctx.BindJSON(&body); err != nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	pizza, err := h.Repository.Get(id)
+	var pizza *models.Pizza
+	pizza, err = h.Repository.Get(id)
 	if err != nil {
 		ctx.AbortWithError(http.StatusNotFound, err)
 		return
@@ -31,8 +34,12 @@ func (h handler) UpdatePizza(ctx *gin.Context) {
 
 	pizza.Name = body.Name
 	pizza.Description = body.Description
+	pizza, err = h.Repository.Update(*pizza)
+	if err != nil {
+		fmt.Printf("failed to update pizza: %s\n", err)
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 
-	h.Repository.Update(*pizza)
-
-	ctx.JSON(http.StatusOK, &pizza)
+	ctx.JSON(http.StatusOK, pizza)
 }

@@ -1,19 +1,23 @@
 package pizzas
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
+	"pizza/pkg/common/models"
 )
 
 func (h handler) GetPizza(ctx *gin.Context) {
-	var id, parseError = uuid.Parse(ctx.Param("id"))
-	if parseError != nil {
-		ctx.AbortWithError(http.StatusNotFound, parseError)
+	var id, err = uuid.Parse(ctx.Param("id"))
+	if err != nil {
+		ctx.AbortWithError(http.StatusNotFound, err)
 	}
 
-	result, err := h.Repository.Get(id)
+	var result *models.Pizza
+	result, err = h.Repository.Get(id)
 	if err != nil {
+		fmt.Printf("failed to get pizza: %s\n", err)
 		ctx.AbortWithError(http.StatusNotFound, err)
 		return
 	}
