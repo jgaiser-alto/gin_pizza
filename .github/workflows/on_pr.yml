@@ -13,16 +13,36 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
       - name: Setup Go ${{ matrix.go-version }}
         uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go-version }}
+
       - name: Install dependencies
         run: go get -v -t -d ./...
+
+      - name: Verify dependencies
+        run: go mod verify
+
       - name: Build
         run: go build -v ./...
+
+      - name: Install golint
+        run: go install golang.org/x/lint/golint@latest
+
+      - name: Run golint
+        run: golint ./...
+
+      - name: Install staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+      - name: Run staticcheck
+        run: staticcheck ./...
+
       - name: Run Go Tests
-        run: go test -v ./... -json > TestResults-${{ matrix.go-version }}.json
+        run: go test -race -vet=off -v ./... -json > TestResults-${{ matrix.go-version }}.json
+
       - name: Upload Go test results
         uses: actions/upload-artifact@v3
         with:
