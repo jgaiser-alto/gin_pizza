@@ -1,4 +1,4 @@
-package pizfzatests
+package pizzatests
 
 import (
 	"bytes"
