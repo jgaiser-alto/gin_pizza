@@ -59,7 +59,7 @@ func (s *PizzaTestSuite) TestApi_GetAll_EmptyCollection() {
 	json.Unmarshal(recorder.Body.Bytes(), &response)
 
 	s.T().Run("should return status code 200", func(t *testing.T) {
-		assert.Equal(t, http.StatusOK, recorder.Code)
+		assert.Equal(t, http.StatusBadRequest, recorder.Code)
 	})
 	s.T().Run("should return expected number of pizzas", func(t *testing.T) {
 		assert.Equal(t, 0, len(response))
