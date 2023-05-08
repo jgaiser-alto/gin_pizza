@@ -4,8 +4,7 @@ on:
   pull_request:
 
 jobs:
-  build:
-
+    name: Pr Verify
     runs-on: ubuntu-latest
     strategy:
       matrix:
