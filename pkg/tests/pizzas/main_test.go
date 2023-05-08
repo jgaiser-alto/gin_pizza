@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/suite"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"pizza/pkg/common/models"
 	"pizza/pkg/pizzas"
 	"testing"
 )
@@ -19,7 +18,6 @@ type PizzaTestSuite struct {
 	mock       sqlmock.Sqlmock
 	router     *gin.Engine
 	repository pizzas.Repository
-	pizza      *models.Pizza
 	baseUri    string
 }
 

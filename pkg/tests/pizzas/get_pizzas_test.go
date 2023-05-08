@@ -34,7 +34,7 @@ func (s *PizzaTestSuite) TestApi_GetAll() {
 
 	s.router.ServeHTTP(recorder, request)
 
-	json.Unmarshal([]byte(recorder.Body.String()), &response)
+	json.Unmarshal(recorder.Body.Bytes(), &response)
 
 	s.T().Run("should return status code 200", func(t *testing.T) {
 		assert.Equal(t, http.StatusOK, recorder.Code)
@@ -56,7 +56,7 @@ func (s *PizzaTestSuite) TestApi_GetAll_EmptyCollection() {
 
 	s.router.ServeHTTP(recorder, request)
 
-	json.Unmarshal([]byte(recorder.Body.String()), &response)
+	json.Unmarshal(recorder.Body.Bytes(), &response)
 
 	s.T().Run("should return status code 200", func(t *testing.T) {
 		assert.Equal(t, http.StatusOK, recorder.Code)
