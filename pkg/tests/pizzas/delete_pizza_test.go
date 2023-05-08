@@ -1,4 +1,4 @@
-package tests
+package pizza_tests
 
 import (
 	"errors"
@@ -9,9 +9,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"regexp"
+	"testing"
 )
 
-func (s *PizzaTestSuite) TestExpectedPizzaIsDeleted() {
+func (s *PizzaTestSuite) TestApi_DeleteById() {
 	var (
 		id, _       = uuid.NewUUID()
 		name        = "test-name"
@@ -33,10 +34,12 @@ func (s *PizzaTestSuite) TestExpectedPizzaIsDeleted() {
 	s.mock.ExpectCommit()
 
 	s.router.ServeHTTP(recorder, request)
-	assert.Equal(s.T(), http.StatusOK, recorder.Code)
+	s.T().Run("should return status code 200", func(t *testing.T) {
+		assert.Equal(s.T(), http.StatusOK, recorder.Code)
+	})
 }
 
-func (s *PizzaTestSuite) TestPizzaDoesNotExist() {
+func (s *PizzaTestSuite) TestApi_DeleteById_NotFound() {
 	var (
 		id, _      = uuid.NewUUID()
 		url        = fmt.Sprintf("%s/%s", s.baseUri, id.String())
@@ -49,10 +52,12 @@ func (s *PizzaTestSuite) TestPizzaDoesNotExist() {
 		WillReturnRows(sqlmock.NewRows(nil))
 
 	s.router.ServeHTTP(recorder, request)
-	assert.Equal(s.T(), http.StatusNotFound, recorder.Code)
+	s.T().Run("should return status code 404", func(t *testing.T) {
+		assert.Equal(s.T(), http.StatusNotFound, recorder.Code)
+	})
 }
 
-func (s *PizzaTestSuite) TestDeleteExceptionIsThrown() {
+func (s *PizzaTestSuite) TestApi_DeleteById_InternalServerError() {
 	var (
 		id, _       = uuid.NewUUID()
 		name        = "test-name"
@@ -74,5 +79,7 @@ func (s *PizzaTestSuite) TestDeleteExceptionIsThrown() {
 	s.mock.ExpectRollback()
 
 	s.router.ServeHTTP(recorder, request)
-	assert.Equal(s.T(), http.StatusInternalServerError, recorder.Code)
+	s.T().Run("should return status code 500", func(t *testing.T) {
+		assert.Equal(s.T(), http.StatusInternalServerError, recorder.Code)
+	})
 }

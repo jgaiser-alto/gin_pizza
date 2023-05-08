@@ -1,4 +1,4 @@
-package tests
+package pizza_tests
 
 import (
 	"encoding/json"
@@ -10,9 +10,10 @@ import (
 	"net/http/httptest"
 	"pizza/pkg/common/models"
 	"regexp"
+	"testing"
 )
 
-func (s *PizzaTestSuite) TestExpectedPizzasAreReturned() {
+func (s *PizzaTestSuite) TestApi_GetAll() {
 	var (
 		id1, _      = uuid.NewUUID()
 		id2, _      = uuid.NewUUID()
@@ -35,11 +36,15 @@ func (s *PizzaTestSuite) TestExpectedPizzasAreReturned() {
 
 	json.Unmarshal([]byte(recorder.Body.String()), &response)
 
-	assert.Equal(s.T(), http.StatusOK, recorder.Code)
-	assert.Equal(s.T(), 3, len(response))
+	s.T().Run("should return status code 200", func(t *testing.T) {
+		assert.Equal(t, http.StatusOK, recorder.Code)
+	})
+	s.T().Run("should return expected number of pizzas", func(t *testing.T) {
+		assert.Equal(t, 3, len(response))
+	})
 }
 
-func (s *PizzaTestSuite) TestEmptyResponse() {
+func (s *PizzaTestSuite) TestApi_GetAll_EmptyCollection() {
 	var (
 		request, _ = http.NewRequest(http.MethodGet, s.baseUri, nil)
 		recorder   = httptest.NewRecorder()
@@ -53,15 +58,18 @@ func (s *PizzaTestSuite) TestEmptyResponse() {
 
 	json.Unmarshal([]byte(recorder.Body.String()), &response)
 
-	assert.Equal(s.T(), http.StatusOK, recorder.Code)
-	assert.Equal(s.T(), 0, len(response))
+	s.T().Run("should return status code 200", func(t *testing.T) {
+		assert.Equal(t, http.StatusOK, recorder.Code)
+	})
+	s.T().Run("should return expected number of pizzas", func(t *testing.T) {
+		assert.Equal(t, 0, len(response))
+	})
 }
 
-func (s *PizzaTestSuite) TestGetExceptionIsThrown() {
+func (s *PizzaTestSuite) TestApi_GetAll_InternalServerError() {
 	var (
 		request, _ = http.NewRequest(http.MethodGet, s.baseUri, nil)
 		recorder   = httptest.NewRecorder()
-		response   []models.Pizza
 	)
 
 	s.mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "pizzas"`)).
@@ -69,7 +77,7 @@ func (s *PizzaTestSuite) TestGetExceptionIsThrown() {
 
 	s.router.ServeHTTP(recorder, request)
 
-	json.Unmarshal([]byte(recorder.Body.String()), &response)
-
-	assert.Equal(s.T(), http.StatusNotFound, recorder.Code)
+	s.T().Run("should return status code 500", func(t *testing.T) {
+		assert.Equal(t, http.StatusInternalServerError, recorder.Code)
+	})
 }

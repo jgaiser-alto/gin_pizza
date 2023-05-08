@@ -1,4 +1,4 @@
-package tests
+package pizza_tests
 
 import (
 	"bytes"
@@ -14,9 +14,10 @@ import (
 	"pizza/pkg/common/models"
 	"pizza/pkg/pizzas"
 	"regexp"
+	"testing"
 )
 
-func (s *PizzaTestSuite) TestExpectedPizzaIsUpdated() {
+func (s *PizzaTestSuite) TestApi_PutById_ValidRequest() {
 	var (
 		id, _ = uuid.NewUUID()
 		url   = fmt.Sprintf("%s/%s", s.baseUri, id.String())
@@ -46,13 +47,17 @@ func (s *PizzaTestSuite) TestExpectedPizzaIsUpdated() {
 	s.router.ServeHTTP(recorder, request)
 	json.Unmarshal([]byte(recorder.Body.String()), &response)
 
-	assert.Equal(s.T(), http.StatusOK, recorder.Code)
-	if diff := deep.Equal(expectedPizza, &response); diff != nil {
-		s.T().Error(diff)
-	}
+	s.T().Run("should return status code 200", func(t *testing.T) {
+		assert.Equal(t, http.StatusOK, recorder.Code)
+	})
+	s.T().Run("should return expected pizza", func(t *testing.T) {
+		if diff := deep.Equal(expectedPizza, &response); diff != nil {
+			t.Error(diff)
+		}
+	})
 }
 
-func (s *PizzaTestSuite) TestMalformedUpdateRequest() {
+func (s *PizzaTestSuite) TestApi_PutById_MalformedRequest() {
 	var (
 		id, _ = uuid.NewUUID()
 		url   = fmt.Sprintf("%s/%s", s.baseUri, id.String())
@@ -67,10 +72,12 @@ func (s *PizzaTestSuite) TestMalformedUpdateRequest() {
 
 	s.router.ServeHTTP(recorder, request)
 
-	assert.Equal(s.T(), http.StatusBadRequest, recorder.Code)
+	s.T().Run("should return status code 400", func(t *testing.T) {
+		assert.Equal(t, http.StatusBadRequest, recorder.Code)
+	})
 }
 
-func (s *PizzaTestSuite) TestUpdateExceptionIsThrown() {
+func (s *PizzaTestSuite) TestApi_PutById_InternalServerError() {
 	var (
 		id, _ = uuid.NewUUID()
 		url   = fmt.Sprintf("%s/%s", s.baseUri, id.String())
@@ -96,5 +103,7 @@ func (s *PizzaTestSuite) TestUpdateExceptionIsThrown() {
 
 	s.router.ServeHTTP(recorder, request)
 
-	assert.Equal(s.T(), http.StatusInternalServerError, recorder.Code)
+	s.T().Run("should return status code 500", func(t *testing.T) {
+		assert.Equal(t, http.StatusInternalServerError, recorder.Code)
+	})
 }

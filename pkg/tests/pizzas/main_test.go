@@ -1,4 +1,4 @@
-package tests
+package pizza_tests
 
 import (
 	"database/sql"
@@ -23,16 +23,16 @@ type PizzaTestSuite struct {
 	baseUri    string
 }
 
-func (s *PizzaTestSuite) BeforeTest(_, _ string) {
+func (s *PizzaTestSuite) SetupTest() {
 	// prevent shared state between tests
 	s.SetupSuite()
 }
 
 func (s *PizzaTestSuite) AfterTest(_, _ string) {
-	require.NoError(s.T(), s.mock.ExpectationsWereMet())
+	defer require.NoError(s.T(), s.mock.ExpectationsWereMet())
 }
 
-func TestInit(t *testing.T) {
+func TestPizzaTestSuite(t *testing.T) {
 	suite.Run(t, new(PizzaTestSuite))
 }
 
