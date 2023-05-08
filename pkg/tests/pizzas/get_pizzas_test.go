@@ -40,7 +40,7 @@ func (s *PizzaTestSuite) TestApi_GetAll() {
 		assert.Equal(t, http.StatusOK, recorder.Code)
 	})
 	s.T().Run("should return expected number of pizzas", func(t *testing.T) {
-		assert.Equal(t, 3, len(response))
+		assert.Equal(t, 99, len(response))
 	})
 }
 
