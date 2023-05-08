@@ -1,4 +1,4 @@
-package pizza_tests
+package pizzatests
 
 import (
 	"encoding/json"
@@ -20,7 +20,7 @@ func (s *PizzaTestSuite) TestApi_GetById() {
 		id, _       = uuid.NewUUID()
 		name        = "test-name"
 		description = "a test pizza"
-		url         = fmt.Sprintf("%s/%s", s.baseUri, id.String())
+		url         = fmt.Sprintf("%s/%s", s.baseURI, id.String())
 		request, _  = http.NewRequest(http.MethodGet, url, nil)
 		recorder    = httptest.NewRecorder()
 		response    models.Pizza
@@ -33,7 +33,7 @@ func (s *PizzaTestSuite) TestApi_GetById() {
 
 	s.router.ServeHTTP(recorder, request)
 
-	json.Unmarshal([]byte(recorder.Body.String()), &response)
+	json.Unmarshal(recorder.Body.Bytes(), &response)
 	s.T().Run("should return status code 200", func(t *testing.T) {
 		assert.Equal(t, http.StatusOK, recorder.Code)
 	})
@@ -45,7 +45,7 @@ func (s *PizzaTestSuite) TestApi_GetById() {
 func (s *PizzaTestSuite) TestApi_GetById_NotFound() {
 	var (
 		id, _      = uuid.NewUUID()
-		url        = fmt.Sprintf("%s/%s", s.baseUri, id.String())
+		url        = fmt.Sprintf("%s/%s", s.baseURI, id.String())
 		request, _ = http.NewRequest(http.MethodGet, url, nil)
 		recorder   = httptest.NewRecorder()
 	)
@@ -63,7 +63,7 @@ func (s *PizzaTestSuite) TestApi_GetById_NotFound() {
 func (s *PizzaTestSuite) TestApi_GetById_MalformedRequest() {
 	var (
 		id         = "this is not a uuid"
-		url        = fmt.Sprintf("%s/%s", s.baseUri, id)
+		url        = fmt.Sprintf("%s/%s", s.baseURI, id)
 		request, _ = http.NewRequest(http.MethodGet, url, nil)
 		recorder   = httptest.NewRecorder()
 	)

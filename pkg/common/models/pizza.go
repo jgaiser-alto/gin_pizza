@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// Pizza representation of a pizza
 type Pizza struct {
 	ID          uuid.UUID `json:"id" gorm:"type:uuid;default:gen_random_uuid()"`
 	Name        string    `json:"name"`

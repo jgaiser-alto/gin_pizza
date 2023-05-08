@@ -7,6 +7,7 @@ import (
 	"pizza/pkg/common/models"
 )
 
+// AddPizzaRequestBody request body for creating a new pizza
 type AddPizzaRequestBody struct {
 	Name        string `json:"name"  binding:"required"`
 	Description string `json:"description"  binding:"required"`

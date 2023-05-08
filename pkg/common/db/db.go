@@ -7,6 +7,7 @@ import (
 	"pizza/pkg/common/models"
 )
 
+// Init Start the application
 func Init(url string) *gorm.DB {
 	db, err := gorm.Open(postgres.Open(url), &gorm.Config{})
 

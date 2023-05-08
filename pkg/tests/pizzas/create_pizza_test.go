@@ -1,4 +1,4 @@
-package pizza_tests
+package pizzatests
 
 import (
 	"bytes"
@@ -25,7 +25,7 @@ func (s *PizzaTestSuite) TestApi_Post_ValidRequest() {
 		}
 		jsonBody, _   = json.Marshal(body)
 		recorder      = httptest.NewRecorder()
-		request, _    = http.NewRequest(http.MethodPost, s.baseUri, bytes.NewBuffer(jsonBody))
+		request, _    = http.NewRequest(http.MethodPost, s.baseURI, bytes.NewBuffer(jsonBody))
 		expectedPizza = &models.Pizza{ID: id, Name: body.Name, Description: body.Description}
 		response      models.Pizza
 	)
@@ -38,7 +38,7 @@ func (s *PizzaTestSuite) TestApi_Post_ValidRequest() {
 	s.mock.ExpectCommit()
 
 	s.router.ServeHTTP(recorder, request)
-	json.Unmarshal([]byte(recorder.Body.String()), &response)
+	json.Unmarshal(recorder.Body.Bytes(), &response)
 
 	s.T().Run("should return status code 201", func(t *testing.T) {
 		assert.Equal(t, http.StatusCreated, recorder.Code)
@@ -59,7 +59,7 @@ func (s *PizzaTestSuite) TestApi_Post_MalformedRequest() {
 		}
 		jsonBody, _ = json.Marshal(body)
 		recorder    = httptest.NewRecorder()
-		request, _  = http.NewRequest(http.MethodPost, s.baseUri, bytes.NewBuffer(jsonBody))
+		request, _  = http.NewRequest(http.MethodPost, s.baseURI, bytes.NewBuffer(jsonBody))
 	)
 
 	s.router.ServeHTTP(recorder, request)
@@ -77,7 +77,7 @@ func (s *PizzaTestSuite) TestApi_Post_InternalServerError() {
 		}
 		jsonBody, _ = json.Marshal(body)
 		recorder    = httptest.NewRecorder()
-		request, _  = http.NewRequest(http.MethodPost, s.baseUri, bytes.NewBuffer(jsonBody))
+		request, _  = http.NewRequest(http.MethodPost, s.baseURI, bytes.NewBuffer(jsonBody))
 	)
 
 	s.mock.ExpectBegin()
