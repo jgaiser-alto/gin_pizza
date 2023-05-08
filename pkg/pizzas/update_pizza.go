@@ -8,6 +8,7 @@ import (
 	"pizza/pkg/common/models"
 )
 
+// UpdatePizzaRequestBody request body for updating a pizza
 type UpdatePizzaRequestBody struct {
 	Name        string `json:"name" binding:"required"`
 	Description string `json:"description" binding:"required"`

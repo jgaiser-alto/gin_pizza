@@ -9,6 +9,7 @@ type handler struct {
 	Repository Repository
 }
 
+// RegisterRoutes register the /pizzas endpoints
 func RegisterRoutes(router *gin.Engine, db *gorm.DB) {
 	h := handler{
 		Repository: CreateRepository(db),

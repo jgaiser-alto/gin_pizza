@@ -8,6 +8,7 @@ import (
 	"pizza/pkg/common/models"
 )
 
+// Repository interface for interacting with pizzas in the database
 type Repository interface {
 	Get(id uuid.UUID) (*models.Pizza, error)
 	GetAll() ([]*models.Pizza, error)
@@ -20,6 +21,7 @@ type repository struct {
 	DB *gorm.DB
 }
 
+// CreateRepository creates an instance of Repository
 func CreateRepository(db *gorm.DB) Repository {
 	return &repository{DB: db}
 }

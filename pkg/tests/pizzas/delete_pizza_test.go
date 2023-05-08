@@ -1,4 +1,4 @@
-package pizza_tests
+package pizzatests
 
 import (
 	"errors"
@@ -17,7 +17,7 @@ func (s *PizzaTestSuite) TestApi_DeleteById() {
 		id, _       = uuid.NewUUID()
 		name        = "test-name"
 		description = "a test pizza"
-		url         = fmt.Sprintf("%s/%s", s.baseUri, id.String())
+		url         = fmt.Sprintf("%s/%s", s.baseURI, id.String())
 		request, _  = http.NewRequest(http.MethodDelete, url, nil)
 		recorder    = httptest.NewRecorder()
 	)
@@ -42,7 +42,7 @@ func (s *PizzaTestSuite) TestApi_DeleteById() {
 func (s *PizzaTestSuite) TestApi_DeleteById_NotFound() {
 	var (
 		id, _      = uuid.NewUUID()
-		url        = fmt.Sprintf("%s/%s", s.baseUri, id.String())
+		url        = fmt.Sprintf("%s/%s", s.baseURI, id.String())
 		request, _ = http.NewRequest(http.MethodDelete, url, nil)
 		recorder   = httptest.NewRecorder()
 	)
@@ -62,7 +62,7 @@ func (s *PizzaTestSuite) TestApi_DeleteById_InternalServerError() {
 		id, _       = uuid.NewUUID()
 		name        = "test-name"
 		description = "a test pizza"
-		url         = fmt.Sprintf("%s/%s", s.baseUri, id.String())
+		url         = fmt.Sprintf("%s/%s", s.baseURI, id.String())
 		request, _  = http.NewRequest(http.MethodDelete, url, nil)
 		recorder    = httptest.NewRecorder()
 	)

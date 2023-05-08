@@ -1,4 +1,4 @@
-package pizza_tests
+package pizzatests
 
 import (
 	"encoding/json"
@@ -20,7 +20,7 @@ func (s *PizzaTestSuite) TestApi_GetAll() {
 		id3, _      = uuid.NewUUID()
 		name        = "test-name"
 		description = "a test pizza"
-		request, _  = http.NewRequest(http.MethodGet, s.baseUri, nil)
+		request, _  = http.NewRequest(http.MethodGet, s.baseURI, nil)
 		recorder    = httptest.NewRecorder()
 		response    []models.Pizza
 	)
@@ -46,7 +46,7 @@ func (s *PizzaTestSuite) TestApi_GetAll() {
 
 func (s *PizzaTestSuite) TestApi_GetAll_EmptyCollection() {
 	var (
-		request, _ = http.NewRequest(http.MethodGet, s.baseUri, nil)
+		request, _ = http.NewRequest(http.MethodGet, s.baseURI, nil)
 		recorder   = httptest.NewRecorder()
 		response   []models.Pizza
 	)
@@ -68,7 +68,7 @@ func (s *PizzaTestSuite) TestApi_GetAll_EmptyCollection() {
 
 func (s *PizzaTestSuite) TestApi_GetAll_InternalServerError() {
 	var (
-		request, _ = http.NewRequest(http.MethodGet, s.baseUri, nil)
+		request, _ = http.NewRequest(http.MethodGet, s.baseURI, nil)
 		recorder   = httptest.NewRecorder()
 	)
 

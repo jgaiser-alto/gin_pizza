@@ -23,17 +23,17 @@ func main() {
 func run(config *viper.Viper) {
 	var host = config.GetString("server.host")
 	var port = config.GetString("server.port")
-	var dbUrl = config.GetString("database.url")
+	var dbURL = config.GetString("database.url")
 
 	router := gin.Default()
-	dbHandler := db.Init(dbUrl)
+	dbHandler := db.Init(dbURL)
 
 	pizzas.RegisterRoutes(router, dbHandler)
 
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{
 			"port":  port,
-			"dbUrl": dbUrl,
+			"dbURL": dbURL,
 		})
 	})
 

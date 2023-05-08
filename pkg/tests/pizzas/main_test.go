@@ -1,4 +1,4 @@
-package pizza_tests
+package pizzatests
 
 import (
 	"database/sql"
@@ -18,7 +18,7 @@ type PizzaTestSuite struct {
 	mock       sqlmock.Sqlmock
 	router     *gin.Engine
 	repository pizzas.Repository
-	baseUri    string
+	baseURI    string
 }
 
 func (s *PizzaTestSuite) SetupTest() {
@@ -52,7 +52,7 @@ func (s *PizzaTestSuite) SetupSuite() {
 	require.NoError(s.T(), err)
 
 	s.repository = pizzas.CreateRepository(s.DB)
-	s.baseUri = "/pizzas"
+	s.baseURI = "/pizzas"
 
 	router := gin.Default()
 	pizzas.RegisterRoutes(router, s.DB)
